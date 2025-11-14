@@ -22,7 +22,6 @@
 @@||ovhcloud.com^$document
 @@||budgetbakers.com^$document
 @@||mercadolibre.com^$document
-
 @@||meet.google.com^$document
 @@||mail.google.com^$document
 @@||docs.google.com^$document

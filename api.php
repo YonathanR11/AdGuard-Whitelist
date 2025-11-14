@@ -17,13 +17,21 @@ function readWhitelist() {
     
     $header = [];
     $rules = [];
+    $inHeader = true;
     
     foreach ($lines as $line) {
-        if (strpos($line, '@@') === 0) {
-            $rules[] = trim($line);
-        } else {
+        $trimmed = trim($line);
+        if (strpos($trimmed, '@@') === 0) {
+            $rules[] = $trimmed;
+            $inHeader = false;
+        } elseif ($inHeader && ($trimmed !== '' || count($header) > 0)) {
             $header[] = $line;
         }
+    }
+    
+    // Remove trailing empty lines from header
+    while (count($header) > 0 && trim($header[count($header) - 1]) === '') {
+        array_pop($header);
     }
     
     return [
@@ -34,7 +42,7 @@ function readWhitelist() {
 
 function writeWhitelist($header, $rules) {
     global $whitelistFile;
-    $content = $header . "\n" . implode("\n", $rules) . "\n";
+    $content = $header . "\n\n" . implode("\n", $rules) . "\n";
     return file_put_contents($whitelistFile, $content);
 }
 
