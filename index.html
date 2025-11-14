@@ -87,8 +87,9 @@
                 const div = document.createElement('div');
                 div.className = 'flex items-center mb-2';
                 div.innerHTML = `
-                    <span class="flex-1 text-white">${rule}</span>
-                    <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded mr-2" onclick="editRule(${index})">Edit</button>
+                    <span class="text-gray-400 mr-3 min-w-[2.5rem] text-right">${index + 1}.</span>
+                    <span class="flex-1 text-white break-all">${rule}</span>
+                    <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded mr-2 ml-2" onclick="editRule(${index})">Edit</button>
                     <button class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded" onclick="deleteRule(${index})">Delete</button>
                 `;
                 list.appendChild(div);
