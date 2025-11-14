@@ -3,7 +3,7 @@
 ! Version: 2025.11.14
 ! Last modified: 2025-11-14
 ! Expires: 1 day
-! Homepage: https://github.com/TU_USUARIO/adguard-whitelist
+! Homepage: https://github.com/YonathanR11/AdGuard-Whitelist
 ! Author: Yonathan Roman
 
 @@||chatgpt.com^$document
