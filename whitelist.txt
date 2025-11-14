@@ -1,8 +1,8 @@
 ! Title: Yonathan's AdGuard Whitelist
 ! Description: Lista personalizada de sitios permitidos para AdGuard.
 ! Homepage: https://github.com/YonathanR11/AdGuard-Whitelist
-! Version: 2025.11.14.135400
-! Last modified: 2025-11-14 13:54:00
+! Version: 2025.11.14.142155
+! Last modified: 2025-11-14 14:21:55
 ! Expires: 1 day
 ! Author: Yonathan Roman
 
@@ -27,3 +27,22 @@
 @@||docs.google.com^$important,document
 @@||chromewebstore.google.com^$important,document
 @@||gitlab.com^$important,document
+@@||web.whatsapp.com^$important,document
+@@||duckduckgo.com^$important,document
+@@||paypal.com^$important,document
+@@||app.standardnotes.com^$important,document
+@@||bbva.mx^$important,document
+@@||sat.gob.mx^$important,document
+@@||banamex.com^$important,document
+@@||bitwarden.com^$important,document
+@@||adguard-dns.io^$important,document
+@@||dns-family.adguard.com^$important,document
+@@||pages.github.com^$important,document
+@@||github.io^$important,document
+@@||raw.githubusercontent.com^$important,document
+@@||cdn.cloudflare.net^$important,document
+@@||cdnjs.cloudflare.com^$important,document
+@@||open.spotify.com^$important,document
+@@||spotify.com^$important,document
+@@||disneyplus.com^$important,document
+@@||udemy.com^$important,document
