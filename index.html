@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,12 +8,15 @@
 
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-900 p-4 min-h-screen">
     <div class="max-w-4xl mx-auto bg-gray-800 p-6 rounded-lg shadow-md">
         <h1 class="text-2xl font-bold mb-4 text-white text-center">AdGuard Whitelist Editor</h1>
         <div class="flex gap-2 mb-4 justify-center">
-            <button id="add-rule-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Agregar Regla</button>
-            <button id="download" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Descargar whitelist.txt</button>
+            <button id="add-rule-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Agregar
+                Regla</button>
+            <button id="download" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Descargar
+                whitelist.txt</button>
         </div>
         <div id="rules-list" class="mb-4"></div>
     </div>
@@ -27,14 +31,18 @@
                 <input type="checkbox" id="auto-syntax" class="mr-2 w-4 h-4" checked>
                 <span class="text-sm">Auto-completar sintaxis AdGuard</span>
             </label>
-            <input type="text" id="new-rule" class="border border-gray-600 bg-gray-700 text-white p-2 w-full mb-2" placeholder="Escribe el dominio o URL completa">
+            <input type="text" id="new-rule" class="border border-gray-600 bg-gray-700 text-white p-2 w-full mb-2"
+                placeholder="Escribe el dominio o URL completa">
             <p id="add-error" class="text-sm text-red-500 mb-2 hidden"></p>
             <p class="text-xs text-gray-400 mb-4">
-                Ejemplo: <code class="text-green-400">https://example.com/app</code> → <code class="text-blue-400">@@||example.com^$document</code>
+                Ejemplo: <code class="text-green-400">https://example.com/app</code> → <code
+                    class="text-blue-400">@@||example.com^$document</code>
             </p>
             <div class="flex justify-end">
-                <button id="cancel-add" class="mr-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
-                <button id="confirm-add" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Agregar</button>
+                <button id="cancel-add"
+                    class="mr-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
+                <button id="confirm-add"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Agregar</button>
             </div>
         </div>
     </div>
@@ -46,8 +54,10 @@
                 <code id="delete-rule-text" class="text-red-400"></code>
             </div>
             <div class="flex justify-end">
-                <button id="cancel-delete" class="mr-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
-                <button id="confirm-delete" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Eliminar</button>
+                <button id="cancel-delete"
+                    class="mr-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
+                <button id="confirm-delete"
+                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Eliminar</button>
             </div>
         </div>
     </div>
@@ -57,8 +67,10 @@
             <input type="text" id="edit-input" class="border border-gray-600 bg-gray-700 text-white p-2 w-full mb-2">
             <p id="edit-error" class="text-sm text-red-500 mb-4 hidden"></p>
             <div class="flex justify-end">
-                <button id="cancel-edit" class="mr-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
-                <button id="save-edit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Guardar</button>
+                <button id="cancel-edit"
+                    class="mr-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
+                <button id="save-edit"
+                    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Guardar</button>
             </div>
         </div>
     </div>
@@ -101,14 +113,14 @@
         function extractHost(input) {
             const extractHostEnabled = document.getElementById('extract-host').checked;
             let domain = input.trim();
-            
+
             if (!domain) return '';
-            
+
             // Only extract host if checkbox is enabled
             if (!extractHostEnabled) {
                 return domain;
             }
-            
+
             try {
                 // Try to parse as URL
                 let url;
@@ -126,25 +138,25 @@
                 domain = domain.split('?')[0];
                 domain = domain.split('#')[0];
             }
-            
+
             return domain;
         }
 
         function formatRule(input) {
             const autoSyntax = document.getElementById('auto-syntax').checked;
             let rule = extractHost(input);
-            
+
             if (!rule) return '';
-            
+
             if (autoSyntax && !rule.startsWith('@@')) {
                 // Remove common prefixes if user included them
                 rule = rule.replace(/^https?:\/\//, '');
                 rule = rule.replace(/^www\./, '');
-                
+
                 // Build the complete rule
                 rule = `@@||${rule}^$document`;
             }
-            
+
             return rule;
         }
 
@@ -180,25 +192,25 @@
             hideAddError();
             const input = document.getElementById('new-rule');
             const inputValue = input.value.trim();
-            
+
             if (!inputValue) {
                 showAddError('Por favor ingresa un dominio o regla');
                 return;
             }
-            
+
             const newRule = formatRule(inputValue);
-            
+
             if (!newRule || !newRule.startsWith('@@')) {
                 showAddError('La regla debe comenzar con @@');
                 return;
             }
-            
+
             // Check for duplicates
             if (rules.includes(newRule)) {
                 showAddError('Esta regla ya existe en la lista');
                 return;
             }
-            
+
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
@@ -259,18 +271,18 @@
         document.getElementById('cancel-add').addEventListener('click', closeAddModal);
         document.getElementById('confirm-add').addEventListener('click', addRule);
         document.getElementById('download').addEventListener('click', download);
-        
+
         document.getElementById('new-rule').addEventListener('input', hideAddError);
         document.getElementById('edit-input').addEventListener('input', hideEditError);
-        
+
         document.getElementById('extract-host').addEventListener('change', updatePlaceholder);
         document.getElementById('auto-syntax').addEventListener('change', updatePlaceholder);
-        
+
         function updatePlaceholder() {
             const input = document.getElementById('new-rule');
             const extractHost = document.getElementById('extract-host').checked;
             const autoSyntax = document.getElementById('auto-syntax').checked;
-            
+
             if (extractHost && autoSyntax) {
                 input.placeholder = 'Escribe el dominio o URL completa';
             } else if (extractHost && !autoSyntax) {
@@ -288,24 +300,24 @@
         document.getElementById('save-edit').addEventListener('click', async () => {
             hideEditError();
             const newRule = document.getElementById('edit-input').value.trim();
-            
+
             if (!newRule || !newRule.startsWith('@@')) {
                 showEditError('La regla debe comenzar con @@');
                 return;
             }
-            
+
             // Check if rule is unchanged
             if (newRule === rules[editIndex]) {
                 document.getElementById('edit-modal').classList.add('hidden');
                 return;
             }
-            
+
             // Check for duplicates with other rules
             if (rules.includes(newRule)) {
                 showEditError('Esta regla ya existe en la lista');
                 return;
             }
-            
+
             try {
                 const response = await fetch(API_URL, {
                     method: 'POST',
@@ -354,4 +366,5 @@
         loadRules();
     </script>
 </body>
+
 </html>
