@@ -10,17 +10,32 @@
 <body class="bg-gray-900 p-4 min-h-screen">
     <div class="max-w-4xl mx-auto bg-gray-800 p-6 rounded-lg shadow-md">
         <h1 class="text-2xl font-bold mb-4 text-white text-center">AdGuard Whitelist Editor</h1>
-        <div id="rules-list" class="mb-4"></div>
-        <div class="mb-4">
-            <label class="flex items-center mb-2 text-white">
-                <input type="checkbox" id="auto-syntax" class="mr-2 w-4 h-4" checked>
-                <span class="text-sm">Auto-completar sintaxis (solo escribe el dominio)</span>
-            </label>
-            <input type="text" id="new-rule" class="border border-gray-600 bg-gray-700 text-white p-2 w-full" placeholder="Escribe el dominio, ej: example.com">
-            <p class="text-xs text-gray-400 mt-1">Con auto-completar: <code class="text-green-400">example.com</code> → <code class="text-blue-400">@@||example.com^$document</code></p>
-            <button id="add-rule" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Add Rule</button>
+        <div class="flex gap-2 mb-4 justify-center">
+            <button id="add-rule-btn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Agregar Regla</button>
+            <button id="download" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Descargar whitelist.txt</button>
         </div>
-        <button id="download" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Download whitelist.txt</button>
+        <div id="rules-list" class="mb-4"></div>
+    </div>
+    <div id="add-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 p-6 rounded-lg max-w-2xl w-full">
+            <h2 class="text-xl mb-4 text-white">Agregar Nueva Regla</h2>
+            <label class="flex items-center mb-2 text-white">
+                <input type="checkbox" id="extract-host" class="mr-2 w-4 h-4" checked>
+                <span class="text-sm">Extraer solo el host de la URL</span>
+            </label>
+            <label class="flex items-center mb-3 text-white">
+                <input type="checkbox" id="auto-syntax" class="mr-2 w-4 h-4" checked>
+                <span class="text-sm">Auto-completar sintaxis AdGuard</span>
+            </label>
+            <input type="text" id="new-rule" class="border border-gray-600 bg-gray-700 text-white p-2 w-full mb-2" placeholder="Escribe el dominio o URL completa">
+            <p class="text-xs text-gray-400 mb-4">
+                Ejemplo: <code class="text-green-400">https://example.com/app</code> → <code class="text-blue-400">@@||example.com^$document</code>
+            </p>
+            <div class="flex justify-end">
+                <button id="cancel-add" class="mr-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
+                <button id="confirm-add" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Agregar</button>
+            </div>
+        </div>
     </div>
     <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
         <div class="bg-gray-800 p-6 rounded-lg max-w-2xl w-full">
@@ -80,9 +95,41 @@
             });
         }
 
+        function extractHost(input) {
+            const extractHostEnabled = document.getElementById('extract-host').checked;
+            let domain = input.trim();
+            
+            if (!domain) return '';
+            
+            // Only extract host if checkbox is enabled
+            if (!extractHostEnabled) {
+                return domain;
+            }
+            
+            try {
+                // Try to parse as URL
+                let url;
+                if (domain.startsWith('http://') || domain.startsWith('https://')) {
+                    url = new URL(domain);
+                } else {
+                    // Try adding https:// to parse it
+                    url = new URL('https://' + domain);
+                }
+                domain = url.hostname;
+            } catch (e) {
+                // If URL parsing fails, treat as domain
+                domain = domain.replace(/^https?:\/\//, '');
+                domain = domain.split('/')[0];
+                domain = domain.split('?')[0];
+                domain = domain.split('#')[0];
+            }
+            
+            return domain;
+        }
+
         function formatRule(input) {
             const autoSyntax = document.getElementById('auto-syntax').checked;
-            let rule = input.trim();
+            let rule = extractHost(input);
             
             if (!rule) return '';
             
@@ -96,6 +143,15 @@
             }
             
             return rule;
+        }
+
+        function openAddModal() {
+            document.getElementById('new-rule').value = '';
+            document.getElementById('add-modal').classList.remove('hidden');
+        }
+
+        function closeAddModal() {
+            document.getElementById('add-modal').classList.add('hidden');
         }
 
         async function addRule() {
@@ -121,6 +177,7 @@
                         rules = result.data.rules;
                         header = result.data.header;
                         input.value = '';
+                        closeAddModal();
                         renderRules();
                     } else {
                         alert('Error: ' + result.error);
@@ -150,16 +207,29 @@
             window.location.href = 'whitelist.txt';
         }
 
-        document.getElementById('add-rule').addEventListener('click', addRule);
+        document.getElementById('add-rule-btn').addEventListener('click', openAddModal);
+        document.getElementById('cancel-add').addEventListener('click', closeAddModal);
+        document.getElementById('confirm-add').addEventListener('click', addRule);
         document.getElementById('download').addEventListener('click', download);
-        document.getElementById('auto-syntax').addEventListener('change', (e) => {
+        
+        document.getElementById('extract-host').addEventListener('change', updatePlaceholder);
+        document.getElementById('auto-syntax').addEventListener('change', updatePlaceholder);
+        
+        function updatePlaceholder() {
             const input = document.getElementById('new-rule');
-            if (e.target.checked) {
+            const extractHost = document.getElementById('extract-host').checked;
+            const autoSyntax = document.getElementById('auto-syntax').checked;
+            
+            if (extractHost && autoSyntax) {
+                input.placeholder = 'Escribe el dominio o URL completa';
+            } else if (extractHost && !autoSyntax) {
+                input.placeholder = 'Escribe la URL completa para extraer el host';
+            } else if (!extractHost && autoSyntax) {
                 input.placeholder = 'Escribe el dominio, ej: example.com';
             } else {
-                input.placeholder = 'Enter new rule, e.g., @@||example.com^$document';
+                input.placeholder = 'Escribe la regla completa, ej: @@||example.com^$document';
             }
-        });
+        }
         document.getElementById('cancel-edit').addEventListener('click', () => {
             document.getElementById('edit-modal').classList.add('hidden');
         });
