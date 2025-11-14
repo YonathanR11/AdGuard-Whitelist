@@ -80,6 +80,11 @@ switch ($method) {
             case 'add':
                 $newRule = trim($input['rule'] ?? '');
                 if ($newRule && strpos($newRule, '@@') === 0) {
+                    // Check for duplicates
+                    if (in_array($newRule, $data['rules'])) {
+                        echo json_encode(['success' => false, 'error' => 'Rule already exists']);
+                        break;
+                    }
                     $data['rules'][] = $newRule;
                     $data['header'] = updateLastModified($data['header']);
                     writeWhitelist($data['header'], $data['rules']);
@@ -93,6 +98,16 @@ switch ($method) {
                 $index = $input['index'] ?? -1;
                 $newRule = trim($input['rule'] ?? '');
                 if ($index >= 0 && $index < count($data['rules']) && $newRule && strpos($newRule, '@@') === 0) {
+                    // Check if the new rule is different from the current one
+                    if ($data['rules'][$index] !== $newRule) {
+                        // Check for duplicates with other rules
+                        foreach ($data['rules'] as $i => $rule) {
+                            if ($i !== $index && $rule === $newRule) {
+                                echo json_encode(['success' => false, 'error' => 'Rule already exists']);
+                                break 2;
+                            }
+                        }
+                    }
                     $data['rules'][$index] = $newRule;
                     $data['header'] = updateLastModified($data['header']);
                     writeWhitelist($data['header'], $data['rules']);

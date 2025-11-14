@@ -28,6 +28,7 @@
                 <span class="text-sm">Auto-completar sintaxis AdGuard</span>
             </label>
             <input type="text" id="new-rule" class="border border-gray-600 bg-gray-700 text-white p-2 w-full mb-2" placeholder="Escribe el dominio o URL completa">
+            <p id="add-error" class="text-sm text-red-500 mb-2 hidden"></p>
             <p class="text-xs text-gray-400 mb-4">
                 Ejemplo: <code class="text-green-400">https://example.com/app</code> → <code class="text-blue-400">@@||example.com^$document</code>
             </p>
@@ -52,11 +53,12 @@
     </div>
     <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
         <div class="bg-gray-800 p-6 rounded-lg max-w-2xl w-full">
-            <h2 class="text-xl mb-4 text-white">Edit Rule</h2>
-            <input type="text" id="edit-input" class="border border-gray-600 bg-gray-700 text-white p-2 w-full mb-4">
+            <h2 class="text-xl mb-4 text-white">Editar Regla</h2>
+            <input type="text" id="edit-input" class="border border-gray-600 bg-gray-700 text-white p-2 w-full mb-2">
+            <p id="edit-error" class="text-sm text-red-500 mb-4 hidden"></p>
             <div class="flex justify-end">
-                <button id="cancel-edit" class="mr-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Cancel</button>
-                <button id="save-edit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+                <button id="cancel-edit" class="mr-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
+                <button id="save-edit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Guardar</button>
             </div>
         </div>
     </div>
@@ -146,55 +148,100 @@
             return rule;
         }
 
+        function showAddError(message) {
+            const errorElement = document.getElementById('add-error');
+            const inputElement = document.getElementById('new-rule');
+            errorElement.textContent = message;
+            errorElement.classList.remove('hidden');
+            inputElement.classList.remove('border-gray-600');
+            inputElement.classList.add('border-red-500');
+        }
+
+        function hideAddError() {
+            const errorElement = document.getElementById('add-error');
+            const inputElement = document.getElementById('new-rule');
+            errorElement.classList.add('hidden');
+            inputElement.classList.remove('border-red-500');
+            inputElement.classList.add('border-gray-600');
+        }
+
         function openAddModal() {
             document.getElementById('new-rule').value = '';
+            hideAddError();
             document.getElementById('add-modal').classList.remove('hidden');
         }
 
         function closeAddModal() {
+            hideAddError();
             document.getElementById('add-modal').classList.add('hidden');
         }
 
         async function addRule() {
+            hideAddError();
             const input = document.getElementById('new-rule');
             const inputValue = input.value.trim();
             
             if (!inputValue) {
-                alert('Por favor ingresa un dominio o regla');
+                showAddError('Por favor ingresa un dominio o regla');
                 return;
             }
             
             const newRule = formatRule(inputValue);
             
-            if (newRule && newRule.startsWith('@@')) {
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: 'add', rule: newRule })
-                    });
-                    const result = await response.json();
-                    if (result.success) {
-                        rules = result.data.rules;
-                        header = result.data.header;
-                        input.value = '';
-                        closeAddModal();
-                        renderRules();
-                    } else {
-                        alert('Error: ' + result.error);
-                    }
-                } catch (error) {
-                    console.error('Error adding rule:', error);
-                    alert('Error al agregar la regla');
-                }
-            } else {
-                alert('La regla debe comenzar con @@');
+            if (!newRule || !newRule.startsWith('@@')) {
+                showAddError('La regla debe comenzar con @@');
+                return;
             }
+            
+            // Check for duplicates
+            if (rules.includes(newRule)) {
+                showAddError('Esta regla ya existe en la lista');
+                return;
+            }
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'add', rule: newRule })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    rules = result.data.rules;
+                    header = result.data.header;
+                    input.value = '';
+                    closeAddModal();
+                    renderRules();
+                } else {
+                    showAddError('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error adding rule:', error);
+                showAddError('Error al agregar la regla');
+            }
+        }
+
+        function showEditError(message) {
+            const errorElement = document.getElementById('edit-error');
+            const inputElement = document.getElementById('edit-input');
+            errorElement.textContent = message;
+            errorElement.classList.remove('hidden');
+            inputElement.classList.remove('border-gray-600');
+            inputElement.classList.add('border-red-500');
+        }
+
+        function hideEditError() {
+            const errorElement = document.getElementById('edit-error');
+            const inputElement = document.getElementById('edit-input');
+            errorElement.classList.add('hidden');
+            inputElement.classList.remove('border-red-500');
+            inputElement.classList.add('border-gray-600');
         }
 
         function editRule(index) {
             editIndex = index;
             document.getElementById('edit-input').value = rules[index];
+            hideEditError();
             document.getElementById('edit-modal').classList.remove('hidden');
         }
 
@@ -212,6 +259,9 @@
         document.getElementById('cancel-add').addEventListener('click', closeAddModal);
         document.getElementById('confirm-add').addEventListener('click', addRule);
         document.getElementById('download').addEventListener('click', download);
+        
+        document.getElementById('new-rule').addEventListener('input', hideAddError);
+        document.getElementById('edit-input').addEventListener('input', hideEditError);
         
         document.getElementById('extract-host').addEventListener('change', updatePlaceholder);
         document.getElementById('auto-syntax').addEventListener('change', updatePlaceholder);
@@ -232,32 +282,48 @@
             }
         }
         document.getElementById('cancel-edit').addEventListener('click', () => {
+            hideEditError();
             document.getElementById('edit-modal').classList.add('hidden');
         });
         document.getElementById('save-edit').addEventListener('click', async () => {
+            hideEditError();
             const newRule = document.getElementById('edit-input').value.trim();
-            if (newRule && newRule.startsWith('@@')) {
-                try {
-                    const response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: 'edit', index: editIndex, rule: newRule })
-                    });
-                    const result = await response.json();
-                    if (result.success) {
-                        rules = result.data.rules;
-                        header = result.data.header;
-                        renderRules();
-                        document.getElementById('edit-modal').classList.add('hidden');
-                    } else {
-                        alert('Error: ' + result.error);
-                    }
-                } catch (error) {
-                    console.error('Error editing rule:', error);
-                    alert('Error al editar la regla');
+            
+            if (!newRule || !newRule.startsWith('@@')) {
+                showEditError('La regla debe comenzar con @@');
+                return;
+            }
+            
+            // Check if rule is unchanged
+            if (newRule === rules[editIndex]) {
+                document.getElementById('edit-modal').classList.add('hidden');
+                return;
+            }
+            
+            // Check for duplicates with other rules
+            if (rules.includes(newRule)) {
+                showEditError('Esta regla ya existe en la lista');
+                return;
+            }
+            
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'edit', index: editIndex, rule: newRule })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    rules = result.data.rules;
+                    header = result.data.header;
+                    renderRules();
+                    document.getElementById('edit-modal').classList.add('hidden');
+                } else {
+                    showEditError('Error: ' + result.error);
                 }
-            } else {
-                alert('La regla debe comenzar con @@');
+            } catch (error) {
+                console.error('Error editing rule:', error);
+                showEditError('Error al editar la regla');
             }
         });
         document.getElementById('cancel-delete').addEventListener('click', () => {
