@@ -8,9 +8,11 @@ Editor web para gestionar listas blancas de AdGuard con una interfaz intuitiva y
 - 🔄 **Sincronización en Tiempo Real**: Los cambios se guardan directamente en `whitelist.txt`
 - 🤖 **Auto-completar Sintaxis**: Convierte automáticamente dominios a formato AdGuard
 - 🌐 **Extracción de Host**: Extrae el dominio de URLs completas
+- ⚡ **Modificador $important**: Opción para agregar prioridad alta a las reglas
 - 🚫 **Validación de Duplicados**: Previene reglas duplicadas
 - 💾 **Descarga Directa**: Descarga el archivo `whitelist.txt` actualizado
 - 🎨 **Interfaz Moderna**: UI oscura con Tailwind CSS
+- ⏰ **Versionado Automático**: Actualiza fecha, hora y versión en cada cambio (zona horaria México)
 
 ## Requisitos
 
@@ -36,12 +38,14 @@ Editor web para gestionar listas blancas de AdGuard con una interfaz intuitiva y
 ### Agregar una Regla
 
 1. Haz clic en el botón **"Agregar Regla"**
-2. En el modal, tienes dos opciones:
+2. En el modal, tienes tres opciones:
    - **Extraer solo el host**: Extrae el dominio de URLs completas
    - **Auto-completar sintaxis**: Agrega automáticamente la sintaxis AdGuard
+   - **Agregar modificador $important**: Da prioridad alta a la regla
 3. Escribe el dominio o URL:
-   - Con ambos checks activados: `https://example.com/page` → `@@||example.com^$document`
-   - Solo dominio: `example.com` → `@@||example.com^$document`
+   - Básico: `example.com` → `@@||example.com^$document`
+   - Con URL completa: `https://example.com/page` → `@@||example.com^$document`
+   - Con $important: `example.com` → `@@||example.com^$important,document`
 4. Haz clic en **"Agregar"**
 
 ### Editar una Regla
@@ -127,6 +131,7 @@ AdGuardWhitelist/
 
 Las reglas siguen el formato estándar de AdGuard:
 
+### Regla Básica
 ```
 @@||dominio.com^$document
 ```
@@ -135,6 +140,15 @@ Las reglas siguen el formato estándar de AdGuard:
 - `||` - Coincide con el inicio del nombre de dominio
 - `^` - Separador (fin del dominio)
 - `$document` - Modificador que aplica la regla a documentos principales
+
+### Regla con Prioridad Alta
+```
+@@||dominio.com^$important,document
+```
+
+- `$important` - Hace que la regla tenga prioridad sobre otras reglas de filtrado
+- Útil para asegurar que ciertos sitios siempre estén permitidos
+- Se coloca antes del modificador `$document`
 
 ## Características Técnicas
 
@@ -151,7 +165,8 @@ Las reglas siguen el formato estándar de AdGuard:
 - API RESTful con PHP
 - Operaciones GET y POST
 - Validación de duplicados
-- Actualización automática de fecha y versión
+- Actualización automática de fecha, hora y versión (con segundos)
+- Zona horaria: America/Mexico_City
 - Preservación del formato del archivo
 
 ## Validaciones
@@ -166,8 +181,8 @@ Las reglas siguen el formato estándar de AdGuard:
 ```
 ! Title: Yonathan's AdGuard Whitelist
 ! Description: Lista personalizada de sitios permitidos para AdGuard.
-! Version: 2025.11.14
-! Last modified: 2025-11-14
+! Version: 2025.11.14.153045
+! Last modified: 2025-11-14 15:30:45
 ! Expires: 1 day
 ! Homepage: https://github.com/YonathanR11/AdGuard-Whitelist
 ! Author: Yonathan Roman
@@ -175,6 +190,7 @@ Las reglas siguen el formato estándar de AdGuard:
 @@||chatgpt.com^$document
 @@||claude.ai^$document
 @@||github.com^$document
+@@||worldtimeapi.org^$important,document
 @@||google.com^$document
 ```
 
