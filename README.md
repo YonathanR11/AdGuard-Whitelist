@@ -71,10 +71,18 @@ Puedes importar esta whitelist directamente en AdGuard usando una URL:
 2. Ve a **Configuración** → **Filtros** → **Listas blancas**
 3. Haz clic en **"Agregar filtro personalizado"** o **"Añadir lista blanca"**
 4. Ingresa la URL de tu archivo `whitelist.txt`:
+   
+   **Opción 1: GitHub Raw (con caché)**
    ```
    https://raw.githubusercontent.com/YonathanR11/AdGuard-Whitelist/main/whitelist.txt
    ```
-   O si tienes el archivo en un servidor propio:
+   
+   **Opción 2: GitHack (menos caché, más actualizado)** - Recomendado
+   ```
+   https://raw.githack.com/YonathanR11/AdGuard-Whitelist/main/whitelist.txt
+   ```
+   
+   **Opción 3: Servidor propio**
    ```
    https://tu-servidor.com/AdGuardWhitelist/whitelist.txt
    ```
@@ -87,7 +95,8 @@ Puedes importar esta whitelist directamente en AdGuard usando una URL:
 3. Haz clic en **"Añadir lista de permitidos"**
 4. Ingresa:
    - **Nombre**: Yonathan's Whitelist
-   - **URL**: `https://raw.githubusercontent.com/YonathanR11/AdGuard-Whitelist/main/whitelist.txt`
+   - **URL**: `https://raw.githack.com/YonathanR11/AdGuard-Whitelist/main/whitelist.txt` (Recomendado)
+   - Alternativa: `https://raw.githubusercontent.com/YonathanR11/AdGuard-Whitelist/main/whitelist.txt`
 5. Haz clic en **"Guardar"**
 
 #### Actualización Automática
@@ -96,10 +105,11 @@ AdGuard actualizará automáticamente la lista según el parámetro `Expires` en
 
 #### Notas Importantes
 
+- **GitHack vs GitHub Raw**: GitHack tiene menos caché que GitHub Raw, lo que significa que los cambios se reflejan más rápido
 - Si usas GitHub, asegúrate de hacer commit y push de los cambios en `whitelist.txt`
 - Si usas un servidor propio, asegúrate de que el archivo sea accesible públicamente
 - La URL debe apuntar directamente al archivo de texto sin procesar (raw)
-- AdGuard verificará actualizaciones según el intervalo definido en `Expires`
+- AdGuard verificará actualizaciones según el intervalo definido en `Expires` (1 día)
 
 ## Estructura de Archivos
 
