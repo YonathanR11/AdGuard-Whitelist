@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('America/Mexico_City');
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
@@ -49,11 +51,12 @@ function writeWhitelist($header, $rules) {
 function updateLastModified($header) {
     $lines = explode("\n", $header);
     $today = date('Y-m-d');
-    $version = date('Y.m.d');
+    $datetime = date('Y-m-d H:i:s');
+    $version = date('Y.m.d.His');
     
     foreach ($lines as &$line) {
         if (strpos($line, '! Last modified:') === 0) {
-            $line = '! Last modified: ' . $today;
+            $line = '! Last modified: ' . $datetime;
         } elseif (strpos($line, '! Version:') === 0) {
             $line = '! Version: ' . $version;
         }
