@@ -61,6 +61,46 @@ Editor web para gestionar listas blancas de AdGuard con una interfaz intuitiva y
 1. Haz clic en el botón **"Descargar whitelist.txt"**
 2. El archivo actualizado se descarga automáticamente
 
+### Importar en AdGuard
+
+Puedes importar esta whitelist directamente en AdGuard usando una URL:
+
+#### AdGuard para Windows/Mac/Android
+
+1. Abre AdGuard
+2. Ve a **Configuración** → **Filtros** → **Listas blancas**
+3. Haz clic en **"Agregar filtro personalizado"** o **"Añadir lista blanca"**
+4. Ingresa la URL de tu archivo `whitelist.txt`:
+   ```
+   https://raw.githubusercontent.com/YonathanR11/AdGuard-Whitelist/main/whitelist.txt
+   ```
+   O si tienes el archivo en un servidor propio:
+   ```
+   https://tu-servidor.com/AdGuardWhitelist/whitelist.txt
+   ```
+5. Haz clic en **"Agregar"** o **"Siguiente"**
+
+#### AdGuard Home
+
+1. Accede al panel de AdGuard Home
+2. Ve a **Filtros** → **Listas de permitidos DNS**
+3. Haz clic en **"Añadir lista de permitidos"**
+4. Ingresa:
+   - **Nombre**: Yonathan's Whitelist
+   - **URL**: `https://raw.githubusercontent.com/YonathanR11/AdGuard-Whitelist/main/whitelist.txt`
+5. Haz clic en **"Guardar"**
+
+#### Actualización Automática
+
+AdGuard actualizará automáticamente la lista según el parámetro `Expires` en el archivo (configurado para 1 día). Esto significa que cualquier cambio que hagas en el editor se reflejará automáticamente en AdGuard después de la siguiente actualización.
+
+#### Notas Importantes
+
+- Si usas GitHub, asegúrate de hacer commit y push de los cambios en `whitelist.txt`
+- Si usas un servidor propio, asegúrate de que el archivo sea accesible públicamente
+- La URL debe apuntar directamente al archivo de texto sin procesar (raw)
+- AdGuard verificará actualizaciones según el intervalo definido en `Expires`
+
 ## Estructura de Archivos
 
 ```
