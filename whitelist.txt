@@ -1,0 +1,29 @@
+! Title: Yonathan's AdGuard Whitelist
+! Description: Lista personalizada de sitios permitidos para AdGuard.
+! Version: 2025.11.14
+! Last modified: 2025-11-14
+! Expires: 1 day
+! Homepage: https://github.com/TU_USUARIO/adguard-whitelist
+! Author: Yonathan Roman
+
+@@||chatgpt.com^$document
+@@||claude.ai^$document
+@@||occ.com.mx^$document
+@@||indeed.com^$document
+@@||computrabajo.com^$document
+@@||linkedin.com^$document
+@@||z.ai^$document
+@@||openrouter.ai^$document
+@@||infinityfree.com^$document
+@@||proton.me^$document
+@@||filemanager.ai^$document
+@@||heliohost.org^$document
+@@||github.com^$document
+@@||ovhcloud.com^$document
+@@||budgetbakers.com^$document
+@@||mercadolibre.com^$document
+
+@@||meet.google.com^$document
+@@||mail.google.com^$document
+@@||docs.google.com^$document
+@@||chromewebstore.google.com^$document

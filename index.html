@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdGuard Whitelist Editor</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 p-4 min-h-screen">
+    <div class="max-w-4xl mx-auto bg-gray-800 p-6 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-4 text-white text-center">AdGuard Whitelist Editor</h1>
+        <div id="rules-list" class="mb-4"></div>
+        <div class="mb-4">
+            <input type="text" id="new-rule" class="border border-gray-600 bg-gray-700 text-white p-2 w-full" placeholder="Enter new rule, e.g., @@||example.com^$document">
+            <button id="add-rule" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Add Rule</button>
+        </div>
+        <button id="download" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Download whitelist.txt</button>
+    </div>
+    <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full">
+            <h2 class="text-xl mb-4 text-gray-900 dark:text-white">Confirmar Eliminación</h2>
+            <p class="mb-4 text-gray-900 dark:text-white">¿Estás seguro de que quieres eliminar esta regla?</p>
+            <div class="flex justify-end">
+                <button id="cancel-delete" class="mr-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
+                <button id="confirm-delete" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Eliminar</button>
+            </div>
+        </div>
+    </div>
+    <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
+        <div class="bg-gray-800 p-6 rounded-lg max-w-2xl w-full">
+            <h2 class="text-xl mb-4 text-white">Edit Rule</h2>
+            <input type="text" id="edit-input" class="border border-gray-600 bg-gray-700 text-white p-2 w-full mb-4">
+            <div class="flex justify-end">
+                <button id="cancel-edit" class="mr-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Cancel</button>
+                <button id="save-edit" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Save</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        const initialContent = `! Title: Yonathan's AdGuard Whitelist
+! Description: Lista personalizada de sitios permitidos para AdGuard.
+! Version: 2025.11.14
+! Last modified: 2025-11-14
+! Expires: 1 day
+! Homepage: https://github.com/TU_USUARIO/adguard-whitelist
+! Author: Yonathan Roman
+
+@@||chatgpt.com^$document
+@@||claude.ai^$document
+@@||occ.com.mx^$document
+@@||indeed.com^$document
+@@||computrabajo.com^$document
+@@||linkedin.com^$document
+@@||z.ai^$document
+@@||openrouter.ai^$document
+@@||infinityfree.com^$document
+@@||proton.me^$document
+@@||filemanager.ai^$document
+@@||heliohost.org^$document
+@@||github.com^$document
+@@||ovhcloud.com^$document
+@@||budgetbakers.com^$document
+@@||mercadolibre.com^$document
+
+@@||meet.google.com^$document
+@@||mail.google.com^$document
+@@||docs.google.com^$document
+@@||chromewebstore.google.com^$document
+`;
+        let rules = initialContent.split('\n').filter(line => line.startsWith('@@'));
+        let editIndex = -1;
+        let deleteIndex = -1;
+
+        function renderRules() {
+            const list = document.getElementById('rules-list');
+            list.innerHTML = '';
+            rules.forEach((rule, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center mb-2';
+                div.innerHTML = `
+                    <span class="flex-1 text-white">${rule}</span>
+                    <button class="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded mr-2" onclick="editRule(${index})">Edit</button>
+                    <button class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded" onclick="deleteRule(${index})">Delete</button>
+                `;
+                list.appendChild(div);
+            });
+        }
+        function addRule() {
+            const input = document.getElementById('new-rule');
+            const newRule = input.value.trim();
+            if (newRule && newRule.startsWith('@@')) {
+                rules.push(newRule);
+                input.value = '';
+                renderRules();
+            }
+        }
+        function editRule(index) {
+            editIndex = index;
+            document.getElementById('edit-input').value = rules[index];
+            document.getElementById('edit-modal').classList.remove('hidden');
+        }
+        function deleteRule(index) {
+            deleteIndex = index;
+            document.getElementById('delete-modal').classList.remove('hidden');
+        }
+        function download() {
+            const header = initialContent.split('\n').filter(line => !line.startsWith('@@')).join('\n');
+            const fullContent = header + '\n' + rules.join('\n');
+            const blob = new Blob([fullContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'whitelist.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        document.getElementById('add-rule').addEventListener('click', addRule);
+        document.getElementById('download').addEventListener('click', download);
+        document.getElementById('cancel-edit').addEventListener('click', () => {
+            document.getElementById('edit-modal').classList.add('hidden');
+        });
+        document.getElementById('save-edit').addEventListener('click', () => {
+            const newRule = document.getElementById('edit-input').value.trim();
+            if (newRule && newRule.startsWith('@@')) {
+                rules[editIndex] = newRule;
+                renderRules();
+            }
+            document.getElementById('edit-modal').classList.add('hidden');
+        });
+        document.getElementById('cancel-delete').addEventListener('click', () => {
+            document.getElementById('delete-modal').classList.add('hidden');
+        });
+        document.getElementById('confirm-delete').addEventListener('click', () => {
+            rules.splice(deleteIndex, 1);
+            renderRules();
+            document.getElementById('delete-modal').classList.add('hidden');
+        });
+        renderRules();
+    </script>
+</body>
+</html>
