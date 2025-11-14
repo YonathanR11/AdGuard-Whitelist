@@ -27,14 +27,18 @@
                 <input type="checkbox" id="extract-host" class="mr-2 w-4 h-4" checked>
                 <span class="text-sm">Extraer solo el host de la URL</span>
             </label>
-            <label class="flex items-center mb-3 text-white">
+            <label class="flex items-center mb-2 text-white">
                 <input type="checkbox" id="auto-syntax" class="mr-2 w-4 h-4" checked>
                 <span class="text-sm">Auto-completar sintaxis AdGuard</span>
+            </label>
+            <label class="flex items-center mb-3 text-white">
+                <input type="checkbox" id="add-important" class="mr-2 w-4 h-4">
+                <span class="text-sm">Agregar modificador $important (prioridad alta)</span>
             </label>
             <input type="text" id="new-rule" class="border border-gray-600 bg-gray-700 text-white p-2 w-full mb-2"
                 placeholder="Escribe el dominio o URL completa">
             <p id="add-error" class="text-sm text-red-500 mb-2 hidden"></p>
-            <p class="text-xs text-gray-400 mb-4">
+            <p id="add-preview" class="text-xs text-gray-400 mb-4">
                 Ejemplo: <code class="text-green-400">https://example.com/app</code> → <code
                     class="text-blue-400">@@||example.com^$document</code>
             </p>
@@ -144,6 +148,7 @@
 
         function formatRule(input) {
             const autoSyntax = document.getElementById('auto-syntax').checked;
+            const addImportant = document.getElementById('add-important').checked;
             let rule = extractHost(input);
 
             if (!rule) return '';
@@ -153,8 +158,12 @@
                 rule = rule.replace(/^https?:\/\//, '');
                 rule = rule.replace(/^www\./, '');
 
-                // Build the complete rule
-                rule = `@@||${rule}^$document`;
+                // Build the complete rule with optional $important modifier
+                if (addImportant) {
+                    rule = `@@||${rule}^$important,document`;
+                } else {
+                    rule = `@@||${rule}^$document`;
+                }
             }
 
             return rule;
@@ -275,13 +284,16 @@
         document.getElementById('new-rule').addEventListener('input', hideAddError);
         document.getElementById('edit-input').addEventListener('input', hideEditError);
 
-        document.getElementById('extract-host').addEventListener('change', updatePlaceholder);
-        document.getElementById('auto-syntax').addEventListener('change', updatePlaceholder);
+        document.getElementById('extract-host').addEventListener('change', updatePreview);
+        document.getElementById('auto-syntax').addEventListener('change', updatePreview);
+        document.getElementById('add-important').addEventListener('change', updatePreview);
 
-        function updatePlaceholder() {
+        function updatePreview() {
             const input = document.getElementById('new-rule');
+            const preview = document.getElementById('add-preview');
             const extractHost = document.getElementById('extract-host').checked;
             const autoSyntax = document.getElementById('auto-syntax').checked;
+            const addImportant = document.getElementById('add-important').checked;
 
             if (extractHost && autoSyntax) {
                 input.placeholder = 'Escribe el dominio o URL completa';
@@ -292,6 +304,10 @@
             } else {
                 input.placeholder = 'Escribe la regla completa, ej: @@||example.com^$document';
             }
+
+            // Update example preview
+            const exampleResult = addImportant ? '@@||example.com^$important,document' : '@@||example.com^$document';
+            preview.innerHTML = `Ejemplo: <code class="text-green-400">https://example.com/app</code> → <code class="text-blue-400">${exampleResult}</code>`;
         }
         document.getElementById('cancel-edit').addEventListener('click', () => {
             hideEditError();
