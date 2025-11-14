@@ -26,4 +26,3 @@
 @@||mail.google.com^$document
 @@||docs.google.com^$document
 @@||chromewebstore.google.com^$document
-@@||ilovepdf.com^$document
