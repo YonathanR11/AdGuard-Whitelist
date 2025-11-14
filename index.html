@@ -12,7 +12,12 @@
         <h1 class="text-2xl font-bold mb-4 text-white text-center">AdGuard Whitelist Editor</h1>
         <div id="rules-list" class="mb-4"></div>
         <div class="mb-4">
-            <input type="text" id="new-rule" class="border border-gray-600 bg-gray-700 text-white p-2 w-full" placeholder="Enter new rule, e.g., @@||example.com^$document">
+            <label class="flex items-center mb-2 text-white">
+                <input type="checkbox" id="auto-syntax" class="mr-2 w-4 h-4" checked>
+                <span class="text-sm">Auto-completar sintaxis (solo escribe el dominio)</span>
+            </label>
+            <input type="text" id="new-rule" class="border border-gray-600 bg-gray-700 text-white p-2 w-full" placeholder="Escribe el dominio, ej: example.com">
+            <p class="text-xs text-gray-400 mt-1">Con auto-completar: <code class="text-green-400">example.com</code> → <code class="text-blue-400">@@||example.com^$document</code></p>
             <button id="add-rule" class="mt-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Add Rule</button>
         </div>
         <button id="download" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Download whitelist.txt</button>
@@ -75,9 +80,35 @@
             });
         }
 
+        function formatRule(input) {
+            const autoSyntax = document.getElementById('auto-syntax').checked;
+            let rule = input.trim();
+            
+            if (!rule) return '';
+            
+            if (autoSyntax && !rule.startsWith('@@')) {
+                // Remove common prefixes if user included them
+                rule = rule.replace(/^https?:\/\//, '');
+                rule = rule.replace(/^www\./, '');
+                
+                // Build the complete rule
+                rule = `@@||${rule}^$document`;
+            }
+            
+            return rule;
+        }
+
         async function addRule() {
             const input = document.getElementById('new-rule');
-            const newRule = input.value.trim();
+            const inputValue = input.value.trim();
+            
+            if (!inputValue) {
+                alert('Por favor ingresa un dominio o regla');
+                return;
+            }
+            
+            const newRule = formatRule(inputValue);
+            
             if (newRule && newRule.startsWith('@@')) {
                 try {
                     const response = await fetch(API_URL, {
@@ -121,6 +152,14 @@
 
         document.getElementById('add-rule').addEventListener('click', addRule);
         document.getElementById('download').addEventListener('click', download);
+        document.getElementById('auto-syntax').addEventListener('change', (e) => {
+            const input = document.getElementById('new-rule');
+            if (e.target.checked) {
+                input.placeholder = 'Escribe el dominio, ej: example.com';
+            } else {
+                input.placeholder = 'Enter new rule, e.g., @@||example.com^$document';
+            }
+        });
         document.getElementById('cancel-edit').addEventListener('click', () => {
             document.getElementById('edit-modal').classList.add('hidden');
         });
