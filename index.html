@@ -18,9 +18,12 @@
         <button id="download" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">Download whitelist.txt</button>
     </div>
     <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center">
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg max-w-md w-full">
-            <h2 class="text-xl mb-4 text-gray-900 dark:text-white">Confirmar Eliminación</h2>
-            <p class="mb-4 text-gray-900 dark:text-white">¿Estás seguro de que quieres eliminar esta regla?</p>
+        <div class="bg-gray-800 p-6 rounded-lg max-w-2xl w-full">
+            <h2 class="text-xl mb-4 text-white">Confirmar Eliminación</h2>
+            <p class="mb-2 text-gray-300">¿Estás seguro de que quieres eliminar esta regla?</p>
+            <div class="bg-gray-700 p-3 rounded mb-4 break-all">
+                <code id="delete-rule-text" class="text-red-400"></code>
+            </div>
             <div class="flex justify-end">
                 <button id="cancel-delete" class="mr-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">Cancelar</button>
                 <button id="confirm-delete" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">Eliminar</button>
@@ -38,39 +41,24 @@
         </div>
     </div>
     <script>
-        const initialContent = `! Title: Yonathan's AdGuard Whitelist
-! Description: Lista personalizada de sitios permitidos para AdGuard.
-! Version: 2025.11.14
-! Last modified: 2025-11-14
-! Expires: 1 day
-! Homepage: https://github.com/TU_USUARIO/adguard-whitelist
-! Author: Yonathan Roman
-
-@@||chatgpt.com^$document
-@@||claude.ai^$document
-@@||occ.com.mx^$document
-@@||indeed.com^$document
-@@||computrabajo.com^$document
-@@||linkedin.com^$document
-@@||z.ai^$document
-@@||openrouter.ai^$document
-@@||infinityfree.com^$document
-@@||proton.me^$document
-@@||filemanager.ai^$document
-@@||heliohost.org^$document
-@@||github.com^$document
-@@||ovhcloud.com^$document
-@@||budgetbakers.com^$document
-@@||mercadolibre.com^$document
-
-@@||meet.google.com^$document
-@@||mail.google.com^$document
-@@||docs.google.com^$document
-@@||chromewebstore.google.com^$document
-`;
-        let rules = initialContent.split('\n').filter(line => line.startsWith('@@'));
+        const API_URL = 'api.php';
+        let rules = [];
+        let header = '';
         let editIndex = -1;
         let deleteIndex = -1;
+
+        async function loadRules() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+                rules = data.rules || [];
+                header = data.header || '';
+                renderRules();
+            } catch (error) {
+                console.error('Error loading rules:', error);
+                alert('Error al cargar las reglas del archivo');
+            }
+        }
 
         function renderRules() {
             const list = document.getElementById('rules-list');
@@ -86,57 +74,108 @@
                 list.appendChild(div);
             });
         }
-        function addRule() {
+
+        async function addRule() {
             const input = document.getElementById('new-rule');
             const newRule = input.value.trim();
             if (newRule && newRule.startsWith('@@')) {
-                rules.push(newRule);
-                input.value = '';
-                renderRules();
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'add', rule: newRule })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        rules = result.data.rules;
+                        header = result.data.header;
+                        input.value = '';
+                        renderRules();
+                    } else {
+                        alert('Error: ' + result.error);
+                    }
+                } catch (error) {
+                    console.error('Error adding rule:', error);
+                    alert('Error al agregar la regla');
+                }
+            } else {
+                alert('La regla debe comenzar con @@');
             }
         }
+
         function editRule(index) {
             editIndex = index;
             document.getElementById('edit-input').value = rules[index];
             document.getElementById('edit-modal').classList.remove('hidden');
         }
+
         function deleteRule(index) {
             deleteIndex = index;
+            document.getElementById('delete-rule-text').textContent = rules[index];
             document.getElementById('delete-modal').classList.remove('hidden');
         }
+
         function download() {
-            const header = initialContent.split('\n').filter(line => !line.startsWith('@@')).join('\n');
-            const fullContent = header + '\n' + rules.join('\n');
-            const blob = new Blob([fullContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'whitelist.txt';
-            a.click();
-            URL.revokeObjectURL(url);
+            window.location.href = 'whitelist.txt';
         }
+
         document.getElementById('add-rule').addEventListener('click', addRule);
         document.getElementById('download').addEventListener('click', download);
         document.getElementById('cancel-edit').addEventListener('click', () => {
             document.getElementById('edit-modal').classList.add('hidden');
         });
-        document.getElementById('save-edit').addEventListener('click', () => {
+        document.getElementById('save-edit').addEventListener('click', async () => {
             const newRule = document.getElementById('edit-input').value.trim();
             if (newRule && newRule.startsWith('@@')) {
-                rules[editIndex] = newRule;
-                renderRules();
+                try {
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: 'edit', index: editIndex, rule: newRule })
+                    });
+                    const result = await response.json();
+                    if (result.success) {
+                        rules = result.data.rules;
+                        header = result.data.header;
+                        renderRules();
+                        document.getElementById('edit-modal').classList.add('hidden');
+                    } else {
+                        alert('Error: ' + result.error);
+                    }
+                } catch (error) {
+                    console.error('Error editing rule:', error);
+                    alert('Error al editar la regla');
+                }
+            } else {
+                alert('La regla debe comenzar con @@');
             }
-            document.getElementById('edit-modal').classList.add('hidden');
         });
         document.getElementById('cancel-delete').addEventListener('click', () => {
             document.getElementById('delete-modal').classList.add('hidden');
         });
-        document.getElementById('confirm-delete').addEventListener('click', () => {
-            rules.splice(deleteIndex, 1);
-            renderRules();
-            document.getElementById('delete-modal').classList.add('hidden');
+        document.getElementById('confirm-delete').addEventListener('click', async () => {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'delete', index: deleteIndex })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    rules = result.data.rules;
+                    header = result.data.header;
+                    renderRules();
+                    document.getElementById('delete-modal').classList.add('hidden');
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error deleting rule:', error);
+                alert('Error al eliminar la regla');
+            }
         });
-        renderRules();
+
+        loadRules();
     </script>
 </body>
 </html>
