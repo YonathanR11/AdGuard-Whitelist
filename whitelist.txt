@@ -6,23 +6,23 @@
 ! Homepage: https://github.com/YonathanR11/AdGuard-Whitelist
 ! Author: Yonathan Roman
 
-@@||chatgpt.com^$document
-@@||claude.ai^$document
-@@||occ.com.mx^$document
-@@||indeed.com^$document
-@@||computrabajo.com^$document
-@@||linkedin.com^$document
-@@||z.ai^$document
-@@||openrouter.ai^$document
-@@||infinityfree.com^$document
-@@||proton.me^$document
-@@||filemanager.ai^$document
-@@||heliohost.org^$document
-@@||github.com^$document
-@@||ovhcloud.com^$document
-@@||budgetbakers.com^$document
-@@||mercadolibre.com^$document
-@@||meet.google.com^$document
-@@||mail.google.com^$document
-@@||docs.google.com^$document
-@@||chromewebstore.google.com^$document
+@@||chatgpt.com^$important,document
+@@||claude.ai^$important,document
+@@||occ.com.mx^$important,document
+@@||indeed.com^$important,document
+@@||computrabajo.com^$important,document
+@@||linkedin.com^$important,document
+@@||z.ai^$important,document
+@@||openrouter.ai^$important,document
+@@||infinityfree.com^$important,document
+@@||proton.me^$important,document
+@@||filemanager.ai^$important,document
+@@||heliohost.org^$important,document
+@@||github.com^$important,document
+@@||ovhcloud.com^$important,document
+@@||budgetbakers.com^$important,document
+@@||mercadolibre.com^$important,document
+@@||meet.google.com^$important,document
+@@||mail.google.com^$important,document
+@@||docs.google.com^$important,document
+@@||chromewebstore.google.com^$important,document
