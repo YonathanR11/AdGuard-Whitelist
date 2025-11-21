@@ -54,3 +54,4 @@
 @@||aistudio.google.com^$important,document
 @@||localhost^$important,document
 @@||virustotal.com^$important,document
+@@||anthropic.com^$important,document
