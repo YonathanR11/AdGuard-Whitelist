@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const extractHostCheck = document.getElementById('extract-host');
     const autoSyntaxCheck = document.getElementById('auto-syntax');
     const addImportantCheck = document.getElementById('add-important');
-    const rulePreview = document.getElementById('rule-preview').querySelector('code');
+    const rulePreview = document.querySelector('#rule-preview code');
     const modalError = document.getElementById('modal-error');
     const confirmBtn = document.getElementById('confirm-btn');
 
@@ -73,29 +73,35 @@ document.addEventListener('DOMContentLoaded', () => {
         rulesList.innerHTML = '';
         const filteredRules = rules.filter(rule => rule.toLowerCase().includes(filter.toLowerCase()));
 
+        // Update stats
+        document.getElementById('total-rules').textContent = rules.length;
+        document.getElementById('filtered-rules').textContent = filteredRules.length;
+
         if (filteredRules.length === 0) {
             noResults.classList.remove('hidden');
-            rulesList.classList.add('hidden');
         } else {
             noResults.classList.add('hidden');
-            rulesList.classList.remove('hidden');
         }
 
         filteredRules.forEach((rule) => {
             const index = rules.indexOf(rule);
             const div = document.createElement('div');
-            div.className = 'flex items-center justify-between p-3 rounded-lg transition-colors hover:bg-gray-700';
+            div.className = 'px-4 py-3 flex items-center justify-between hover:bg-neutral-900 transition-colors';
             div.innerHTML = `
-                <div class="flex items-center min-w-0">
-                    <span class="text-gray-500 mr-4 text-sm">${index + 1}.</span>
-                    <span class="text-white break-all truncate" title="${rule}">${rule}</span>
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                    <span class="text-xs font-medium text-neutral-600 w-8 flex-shrink-0">#${index + 1}</span>
+                    <code class="text-sm text-white mono truncate" title="${rule}">${rule}</code>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0 ml-4">
-                    <button class="edit-btn text-gray-400 hover:text-white transition" data-index="${index}" title="Editar">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z"></path></svg>
+                <div class="flex items-center gap-1 flex-shrink-0 ml-4">
+                    <button class="edit-btn icon-btn p-2 rounded-md hover:bg-neutral-800" data-index="${index}" title="Editar">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"></path>
+                        </svg>
                     </button>
-                    <button class="delete-btn text-gray-400 hover:text-red-500 transition" data-index="${index}" title="Eliminar">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <button class="delete-btn icon-btn danger p-2 rounded-md hover:bg-red-950" data-index="${index}" title="Eliminar">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"></path>
+                        </svg>
                     </button>
                 </div>
             `;
@@ -113,14 +119,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 10);
 
         if (type === 'add') {
-            modalTitle.textContent = 'Agregar Nueva Regla';
+            modalTitle.textContent = 'Agregar regla';
             confirmBtn.textContent = 'Agregar';
-            confirmBtn.className = 'bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition';
+            confirmBtn.className = 'btn btn-primary px-4 py-2 rounded-md text-sm';
             ruleInput.value = '';
         } else {
-            modalTitle.textContent = 'Editar Regla';
+            modalTitle.textContent = 'Editar regla';
             confirmBtn.textContent = 'Guardar';
-            confirmBtn.className = 'bg-yellow-600 hover:bg-yellow-700 text-white font-semibold px-4 py-2 rounded-lg transition';
+            confirmBtn.className = 'btn btn-primary px-4 py-2 rounded-md text-sm';
             ruleInput.value = rules[index];
         }
         updatePreview();
@@ -174,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const important = addImportantCheck.checked ? '$important,document' : '$document';
             return `@@||${domain}^${important}`;
         }
-        
+
         return domain;
     }
 
@@ -226,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
             closeDeleteModal();
         }
     }
-    
+
     function showError(message) {
         // Simple alert for now, can be replaced with a more sophisticated notification system
         alert(message);
@@ -236,8 +242,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('add-rule-btn').addEventListener('click', () => openModal('add'));
     document.getElementById('download-btn').addEventListener('click', () => window.location.href = 'whitelist.txt');
     document.getElementById('cancel-btn').addEventListener('click', closeModal);
+    document.getElementById('cancel-btn-2').addEventListener('click', closeModal);
     document.getElementById('confirm-btn').addEventListener('click', handleConfirm);
-    
+
     document.getElementById('cancel-delete-btn').addEventListener('click', closeDeleteModal);
     document.getElementById('confirm-delete-btn').addEventListener('click', handleDeleteConfirm);
 
@@ -253,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     searchInput.addEventListener('input', () => renderRules(searchInput.value));
-    
+
     [ruleInput, extractHostCheck, autoSyntaxCheck, addImportantCheck].forEach(el => {
         el.addEventListener('input', updatePreview);
         el.addEventListener('change', updatePreview);

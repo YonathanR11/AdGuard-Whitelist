@@ -7,123 +7,409 @@
     <link rel="icon" type="image/x-icon" href="favicon.ico">
     <title>Editor de Lista Blanca de AdGuard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <style>
-        :root {
-            font-family: 'Inter', sans-serif;
+        * {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #ededed;
+        }
+
+        code,
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Modern flat card */
+        .card {
+            background: #141414;
+            border: 1px solid #262626;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            border-color: #404040;
+        }
+
+        /* Buttons */
+        .btn {
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: #fafafa;
+            color: #0a0a0a;
+            border-color: #fafafa;
+        }
+
+        .btn-primary:hover {
+            background: #e5e5e5;
+            border-color: #e5e5e5;
+        }
+
+        .btn-secondary {
+            background: #1a1a1a;
+            color: #ededed;
+            border-color: #262626;
+        }
+
+        .btn-secondary:hover {
+            background: #262626;
+            border-color: #404040;
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+            border-color: #dc2626;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+            border-color: #b91c1c;
+        }
+
+        .btn-success {
+            background: #059669;
+            color: white;
+            border-color: #059669;
+        }
+
+        .btn-success:hover {
+            background: #047857;
+            border-color: #047857;
+        }
+
+        /* Input */
+        .input {
+            background: #1a1a1a;
+            border: 1px solid #262626;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #ededed;
+        }
+
+        .input:focus {
+            outline: none;
+            border-color: #fafafa;
+            box-shadow: 0 0 0 3px rgba(250, 250, 250, 0.1);
+        }
+
+        .input::placeholder {
+            color: #737373;
+        }
+
+        /* Rule item */
+        .rule-item {
+            background: #141414;
+            border: 1px solid #262626;
+            transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .rule-item:hover {
+            border-color: #fafafa;
+            background: #1a1a1a;
+        }
+
+        /* Modal backdrop */
+        .modal-backdrop {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+        }
+
+        /* Stats badge */
+        .stat-badge {
+            background: #141414;
+            border: 1px solid #262626;
+        }
+
+        /* Toggle switch */
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #262626;
+            border-radius: 12px;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: #525252;
+            border-radius: 10px;
+            transition: all 0.2s;
+        }
+
+        input:checked+.toggle-switch {
+            background: #fafafa;
+        }
+
+        input:checked+.toggle-switch::after {
+            transform: translateX(20px);
+            background: #0a0a0a;
+        }
+
+        /* Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #404040;
+            border-radius: 3px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #525252;
+        }
+
+        /* Icon button */
+        .icon-btn {
+            color: #737373;
+            transition: color 0.15s;
+        }
+
+        .icon-btn:hover {
+            color: #ededed;
+        }
+
+        .icon-btn.danger:hover {
+            color: #dc2626;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.375rem;
+            padding: 0.25rem 0.625rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 0.375rem;
+        }
+
+        .badge-success {
+            background: #14532d;
+            color: #86efac;
+            border: 1px solid #166534;
+        }
+
+        .badge-neutral {
+            background: #1a1a1a;
+            color: #a3a3a3;
+            border: 1px solid #262626;
         }
     </style>
 </head>
 
-<body class="bg-gray-900 text-gray-100 p-4 sm:p-6 md:p-8 min-h-screen antialiased">
+<body class="antialiased">
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <!-- Header -->
-        <header class="mb-8">
-            <h1 class="text-3xl font-bold text-white text-center mb-2">Editor de Lista Blanca de AdGuard</h1>
-            <p class="text-center text-gray-400">Gestiona fácilmente tus reglas de la lista blanca.</p>
+        <header class="mb-12">
+            <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-3">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" stroke-width="1.5"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z">
+                        </path>
+                    </svg>
+                    <h1 class="text-2xl font-semibold text-white">AdGuard Whitelist</h1>
+                </div>
+                <span class="badge badge-success">
+                    <div class="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
+                    Activo
+                </span>
+            </div>
+            <p class="text-neutral-400 text-sm">Gestiona tus reglas de lista blanca de forma eficiente</p>
         </header>
 
-        <!-- Actions -->
-        <div class="flex flex-col sm:flex-row gap-3 mb-6">
-            <div class="relative flex-grow">
-                <input type="text" id="search-input" placeholder="Buscar reglas..."
-                    class="w-full bg-gray-800 border border-gray-700 rounded-lg py-2 pl-10 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-                <svg class="w-5 h-5 text-gray-400 absolute top-1/2 left-3 -translate-y-1/2"
-                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+        <!-- Stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+            <div class="stat-badge rounded-lg p-4">
+                <div class="text-xs font-medium text-neutral-500 mb-1">Total de reglas</div>
+                <div id="total-rules" class="text-3xl font-semibold text-white">0</div>
             </div>
-            <button id="add-rule-btn"
-                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition flex items-center justify-center gap-2">
-                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Agregar Regla
-            </button>
-            <button id="download-btn"
-                class="bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg transition flex items-center justify-center gap-2">
-                <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                    stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                Descargar
-            </button>
+            <div class="stat-badge rounded-lg p-4">
+                <div class="text-xs font-medium text-neutral-500 mb-1">Mostrando</div>
+                <div id="filtered-rules" class="text-3xl font-semibold text-white">0</div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card rounded-lg p-4 mb-6">
+            <div class="flex flex-col sm:flex-row gap-3">
+                <div class="relative flex-1">
+                    <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" fill="none"
+                        stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" id="search-input" placeholder="Buscar reglas..."
+                        class="input w-full pl-10 pr-4 py-2 rounded-md text-sm">
+                </div>
+                <div class="flex gap-2">
+                    <button id="add-rule-btn"
+                        class="btn btn-primary px-4 py-2 rounded-md text-sm flex items-center gap-2 whitespace-nowrap">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+                        </svg>
+                        Agregar
+                    </button>
+                    <button id="download-btn"
+                        class="btn btn-success px-4 py-2 rounded-md text-sm flex items-center gap-2 whitespace-nowrap">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3">
+                            </path>
+                        </svg>
+                        Descargar
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Rules List -->
-        <div id="rules-container" class="bg-gray-800 p-4 rounded-lg shadow-lg">
-            <div id="rules-list">
+        <div class="card rounded-lg overflow-hidden">
+            <div class="border-b border-neutral-800 px-4 py-3 bg-neutral-900">
+                <h2 class="text-sm font-semibold text-white">Reglas</h2>
+            </div>
+            <div id="rules-list" class="divide-y divide-neutral-800 max-h-[600px] overflow-y-auto custom-scrollbar">
                 <!-- Rules will be rendered here -->
             </div>
-            <p id="no-results" class="text-center text-gray-500 py-8 hidden">No se encontraron reglas.</p>
+            <div id="no-results" class="hidden px-4 py-16 text-center">
+                <svg class="w-12 h-12 mx-auto mb-3 text-neutral-600" fill="none" stroke="currentColor"
+                    stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
+                </svg>
+                <p class="text-sm font-medium text-white mb-1">No se encontraron reglas</p>
+                <p class="text-xs text-neutral-500">Intenta con otro término de búsqueda</p>
+            </div>
         </div>
     </div>
 
     <!-- Add/Edit Modal -->
-    <div id="modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center p-4 z-50">
+    <div id="modal" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-4 z-50">
         <div id="modal-content"
-            class="bg-gray-800 p-6 rounded-lg shadow-xl max-w-2xl w-full transform transition-all opacity-0 scale-95">
-            <h2 id="modal-title" class="text-2xl font-bold mb-6 text-white">Agregar Nueva Regla</h2>
+            class="card rounded-xl max-w-lg w-full transform transition-all opacity-0 scale-95 shadow-xl">
+            <div class="border-b border-neutral-800 px-6 py-4">
+                <div class="flex items-center justify-between">
+                    <h2 id="modal-title" class="text-lg font-semibold text-white">Agregar regla</h2>
+                    <button id="cancel-btn" class="icon-btn p-1 rounded-md hover:bg-neutral-800">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
 
-            <div class="space-y-4">
-                <input type="text" id="rule-input"
-                    class="border border-gray-600 bg-gray-700 text-white p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Escribe el dominio o URL completa">
+            <div class="px-6 py-5 space-y-5">
+                <div>
+                    <label class="block text-xs font-medium text-neutral-400 mb-2">Dominio o URL</label>
+                    <input type="text" id="rule-input" class="input w-full px-3 py-2 rounded-md text-sm"
+                        placeholder="ejemplo.com">
+                </div>
 
-                <div class="space-y-3 text-sm">
-                    <label class="flex items-center text-gray-300 cursor-pointer">
-                        <input type="checkbox" id="extract-host"
-                            class="mr-3 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
-                        Extraer solo el host de la URL
+                <div class="space-y-3">
+                    <label class="text-xs font-medium text-neutral-400">Opciones</label>
+
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <span class="text-sm text-neutral-400 group-hover:text-white">Extraer solo el host</span>
+                        <input type="checkbox" id="extract-host" class="sr-only peer">
+                        <div class="toggle-switch"></div>
                     </label>
-                    <label class="flex items-center text-gray-300 cursor-pointer">
-                        <input type="checkbox" id="auto-syntax"
-                            class="mr-3 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
-                            checked>
-                        Auto-completar sintaxis AdGuard
+
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <span class="text-sm text-neutral-400 group-hover:text-white">Auto-completar
+                            sintaxis</span>
+                        <input type="checkbox" id="auto-syntax" class="sr-only peer" checked>
+                        <div class="toggle-switch"></div>
                     </label>
-                    <label class="flex items-center text-gray-300 cursor-pointer">
-                        <input type="checkbox" id="add-important"
-                            class="mr-3 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
-                        Agregar modificador $important (prioridad alta)
+
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <span class="text-sm text-neutral-400 group-hover:text-white">Modificador
+                            $important</span>
+                        <input type="checkbox" id="add-important" class="sr-only peer">
+                        <div class="toggle-switch"></div>
                     </label>
                 </div>
 
-                <p id="rule-preview" class="text-xs text-gray-400 bg-gray-700 p-2 rounded-md">
-                    Vista previa: <code class="text-green-400">...</code>
+                <div class="stat-badge rounded-md p-3">
+                    <div class="text-xs font-medium text-neutral-500 mb-1">Vista previa</div>
+                    <div id="rule-preview">
+                        <code class="text-xs text-white mono">...</code>
+                    </div>
+                </div>
+
+                <p id="modal-error" class="hidden text-xs text-red-400 bg-red-950 border border-red-900 rounded-md p-3">
                 </p>
-                <p id="modal-error" class="text-sm text-red-400 hidden"></p>
             </div>
 
-            <div class="flex justify-end mt-6 gap-3">
-                <button id="cancel-btn"
-                    class="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg transition">Cancelar</button>
-                <button id="confirm-btn"
-                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition">Confirmar</button>
+            <div class="border-t border-neutral-800 px-6 py-4 flex justify-end gap-2">
+                <button id="cancel-btn-2" class="btn btn-secondary px-4 py-2 rounded-md text-sm">
+                    Cancelar
+                </button>
+                <button id="confirm-btn" class="btn btn-primary px-4 py-2 rounded-md text-sm">
+                    Confirmar
+                </button>
             </div>
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="delete-modal"
-        class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center p-4 z-50">
+    <!-- Delete Modal -->
+    <div id="delete-modal" class="fixed inset-0 modal-backdrop hidden flex items-center justify-center p-4 z-50">
         <div id="delete-modal-content"
-            class="bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full transform transition-all opacity-0 scale-95">
-            <h2 class="text-2xl font-bold mb-4 text-white">Confirmar Eliminación</h2>
-            <p class="mb-4 text-gray-300">¿Estás seguro de que quieres eliminar esta regla?</p>
-            <div class="bg-gray-700 p-3 rounded mb-6 break-all">
-                <code id="delete-rule-text" class="text-red-400"></code>
+            class="card rounded-xl max-w-md w-full transform transition-all opacity-0 scale-95 shadow-xl">
+            <div class="border-b border-neutral-800 px-6 py-4">
+                <div class="flex items-center gap-3">
+                    <div
+                        class="w-10 h-10 rounded-full bg-red-950 flex items-center justify-center flex-shrink-0 border border-red-900">
+                        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round"
+                                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z">
+                            </path>
+                        </svg>
+                    </div>
+                    <h2 class="text-lg font-semibold text-white">Eliminar regla</h2>
+                </div>
             </div>
-            <div class="flex justify-end gap-3">
-                <button id="cancel-delete-btn"
-                    class="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg transition">Cancelar</button>
-                <button id="confirm-delete-btn"
-                    class="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition">Eliminar</button>
+
+            <div class="px-6 py-5 space-y-4">
+                <p class="text-sm text-neutral-400">¿Estás seguro de que deseas eliminar esta regla?</p>
+
+                <div class="stat-badge rounded-md p-3">
+                    <code id="delete-rule-text" class="text-xs text-red-400 mono break-all block"></code>
+                </div>
+            </div>
+
+            <div class="border-t border-neutral-800 px-6 py-4 flex justify-end gap-2">
+                <button id="cancel-delete-btn" class="btn btn-secondary px-4 py-2 rounded-md text-sm">
+                    Cancelar
+                </button>
+                <button id="confirm-delete-btn" class="btn btn-danger px-4 py-2 rounded-md text-sm">
+                    Eliminar
+                </button>
             </div>
         </div>
     </div>
