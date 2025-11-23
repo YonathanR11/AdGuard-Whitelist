@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
     <title>Editor de Lista Blanca de AdGuard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
@@ -38,7 +39,8 @@
                 class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition flex items-center justify-center gap-2">
                 <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
                 Agregar Regla
             </button>
@@ -64,25 +66,30 @@
 
     <!-- Add/Edit Modal -->
     <div id="modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center p-4 z-50">
-        <div id="modal-content" class="bg-gray-800 p-6 rounded-lg shadow-xl max-w-2xl w-full transform transition-all opacity-0 scale-95">
+        <div id="modal-content"
+            class="bg-gray-800 p-6 rounded-lg shadow-xl max-w-2xl w-full transform transition-all opacity-0 scale-95">
             <h2 id="modal-title" class="text-2xl font-bold mb-6 text-white">Agregar Nueva Regla</h2>
-            
+
             <div class="space-y-4">
                 <input type="text" id="rule-input"
                     class="border border-gray-600 bg-gray-700 text-white p-3 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Escribe el dominio o URL completa">
-                
+
                 <div class="space-y-3 text-sm">
                     <label class="flex items-center text-gray-300 cursor-pointer">
-                        <input type="checkbox" id="extract-host" class="mr-3 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
+                        <input type="checkbox" id="extract-host"
+                            class="mr-3 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
                         Extraer solo el host de la URL
                     </label>
                     <label class="flex items-center text-gray-300 cursor-pointer">
-                        <input type="checkbox" id="auto-syntax" class="mr-3 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500" checked>
+                        <input type="checkbox" id="auto-syntax"
+                            class="mr-3 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500"
+                            checked>
                         Auto-completar sintaxis AdGuard
                     </label>
                     <label class="flex items-center text-gray-300 cursor-pointer">
-                        <input type="checkbox" id="add-important" class="mr-3 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
+                        <input type="checkbox" id="add-important"
+                            class="mr-3 w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded focus:ring-blue-500">
                         Agregar modificador $important (prioridad alta)
                     </label>
                 </div>
@@ -94,23 +101,29 @@
             </div>
 
             <div class="flex justify-end mt-6 gap-3">
-                <button id="cancel-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg transition">Cancelar</button>
-                <button id="confirm-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition">Confirmar</button>
+                <button id="cancel-btn"
+                    class="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg transition">Cancelar</button>
+                <button id="confirm-btn"
+                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition">Confirmar</button>
             </div>
         </div>
     </div>
 
     <!-- Delete Confirmation Modal -->
-    <div id="delete-modal" class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center p-4 z-50">
-        <div id="delete-modal-content" class="bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full transform transition-all opacity-0 scale-95">
+    <div id="delete-modal"
+        class="fixed inset-0 bg-black bg-opacity-70 hidden flex items-center justify-center p-4 z-50">
+        <div id="delete-modal-content"
+            class="bg-gray-800 p-6 rounded-lg shadow-xl max-w-md w-full transform transition-all opacity-0 scale-95">
             <h2 class="text-2xl font-bold mb-4 text-white">Confirmar Eliminación</h2>
             <p class="mb-4 text-gray-300">¿Estás seguro de que quieres eliminar esta regla?</p>
             <div class="bg-gray-700 p-3 rounded mb-6 break-all">
                 <code id="delete-rule-text" class="text-red-400"></code>
             </div>
             <div class="flex justify-end gap-3">
-                <button id="cancel-delete-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg transition">Cancelar</button>
-                <button id="confirm-delete-btn" class="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition">Eliminar</button>
+                <button id="cancel-delete-btn"
+                    class="bg-gray-600 hover:bg-gray-700 text-white font-semibold px-4 py-2 rounded-lg transition">Cancelar</button>
+                <button id="confirm-delete-btn"
+                    class="bg-red-600 hover:bg-red-700 text-white font-semibold px-4 py-2 rounded-lg transition">Eliminar</button>
             </div>
         </div>
     </div>
