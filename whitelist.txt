@@ -1,8 +1,8 @@
 ! Title: Yonathan's AdGuard Whitelist
 ! Description: Lista personalizada de sitios permitidos para AdGuard.
 ! Homepage: https://github.com/YonathanR11/AdGuard-Whitelist
-! Version: 2025.11.22.221122
-! Last modified: 2025-11-22 22:11:22
+! Version: 2025.11.23.204746
+! Last modified: 2025-11-23 20:47:46
 ! Expires: 1 day
 ! Author: Yonathan Roman
 
@@ -58,3 +58,4 @@
 @@||vault.bitwarden.com^$important,document
 @@||hotmail.com^$important,document
 @@||outlook.live.com^$important,document
+@@||microsoft.com^$important,document
